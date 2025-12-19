@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h3>Admin WebSocket</h3>
+<pre id="log"></pre>
+
+<script>
+  const log = m =>
+    document.getElementById("log").innerText += m + "\n";
+
+  const ws = new WebSocket("ws://127.0.0.1:8000/ws/admin");
+
+  ws.onopen = () => log("CONNECTED ✅");
+  ws.onmessage = e => log("MESSAGE 🔔: " + e.data);
+  ws.onerror = () => log("ERROR ❌");
+</script>
+</body>
+</html>
