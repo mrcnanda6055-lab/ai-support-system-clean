@@ -42,7 +42,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:3001",
-        "*"  # 🔥 allow Render / frontend domains
+        "*"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -53,20 +53,16 @@ app.add_middleware(
 # ROUTER REGISTRATION
 # =========================
 
-# Core APIs
 app.include_router(chat.router, prefix="/api")
 app.include_router(agent.router, prefix="/api/agent")
 app.include_router(override.router, prefix="/api")
 
-# Dashboard APIs
 app.include_router(dashboard.router, prefix="/api/dashboard")
 app.include_router(dashboard_ticket_detail.router, prefix="/api/dashboard")
 app.include_router(dashboard_metrics.router, prefix="/api/dashboard")
 
-# Admin APIs
 app.include_router(admin_actions.router, prefix="/api/admin")
 
-# WebSocket APIs
 app.include_router(test_ws_page.router)
 app.include_router(ws_admin.router)
 
@@ -75,9 +71,7 @@ app.include_router(ws_admin.router)
 # =========================
 
 def sla_background_worker():
-    """
-    Runs SLA auto-escalation every 60 seconds
-    """
+    time.sleep(5)  # allow app to fully boot
     while True:
         try:
             SLAService.run_sla_check()
@@ -88,11 +82,13 @@ def sla_background_worker():
 
 @app.on_event("startup")
 def start_background_services():
-    thread = threading.Thread(
-        target=sla_background_worker,
-        daemon=True
-    )
-    thread.start()
+    if not hasattr(app.state, "sla_started"):
+        app.state.sla_started = True
+        thread = threading.Thread(
+            target=sla_background_worker,
+            daemon=True
+        )
+        thread.start()
 
 # =========================
 # HEALTH CHECK
@@ -102,26 +98,16 @@ def start_background_services():
 def health_check():
     return {
         "status": "OK",
-        "service": "AI Support Backend",
-        "phase": "Phase 6.2",
-        "features": [
-            "Chat API",
-            "Agent System",
-            "Dashboard",
-            "Admin Actions",
-            "WebSockets",
-            "SLA Auto Escalation"
-        ]
+        "service": "AI Support Backend"
     }
 
 # =========================
-# ROOT (RENDER FIX)
+# ROOT
 # =========================
 
 @app.get("/")
 def root():
     return {
         "status": "AI Support Backend Running",
-        "service": "ai-support-backend",
         "health": "OK"
     }
