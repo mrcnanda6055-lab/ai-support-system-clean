@@ -121,5 +121,7 @@ def health_check():
 def root():
     return {
         "status": "AI Support Backend Running",
-        "phase": "Phase 6.2 (SLA Auto Escalation + Role-based WebSockets Enabled)"
+        "service": "ai-support-backend",
+        "health": "OK"
     }
+
