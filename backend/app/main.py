@@ -41,7 +41,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "http://localhost:3001"
+        "http://localhost:3001",
+        "*"  # 🔥 allow Render / frontend domains
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -94,7 +95,7 @@ def start_background_services():
     thread.start()
 
 # =========================
-# HEALTH CHECK (FOR FRONTEND)
+# HEALTH CHECK
 # =========================
 
 @app.get("/health")
@@ -114,7 +115,7 @@ def health_check():
     }
 
 # =========================
-# ROOT
+# ROOT (RENDER FIX)
 # =========================
 
 @app.get("/")
@@ -124,4 +125,3 @@ def root():
         "service": "ai-support-backend",
         "health": "OK"
     }
-
